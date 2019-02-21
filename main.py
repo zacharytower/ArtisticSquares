@@ -3,6 +3,7 @@ import pdb
 import pygame
 import random
 import sys
+import time
 
 from pygame.locals import *
 
@@ -22,10 +23,6 @@ pygame.init()
 
 screen = pygame.display.set_mode(size, 0, 32)
 
-#background = pygame.Surface(screen.get_size())
-#background = background.convert()
-# background.fill(WHITE)
-
 def recursive_rect_list(
 	left_bound = 0, 
 	right_bound = GLOBAL_WIDTH,
@@ -34,14 +31,18 @@ def recursive_rect_list(
 	length_limit = GLOBAL_LENGTH_LIMIT,
 	lower_mult = GLOBAL_LOWER_MULTIPLIER,
 	upper_mult = GLOBAL_UPPER_MULTIPLIER):
-
+	
+	pdb.set_trace()
 	width_difference = right_bound - left_bound
 	height_difference = bottom_bound - top_bound
 
+	assert width_difference >= 0, 'Width difference is less than zero! Is {}'.format(width_difference)
+	assert height_difference >= 0, 'height_difference is less than zero! Is {}'.format(height_difference)
+
 	if width_difference < length_limit or height_difference < length_limit: 
 		# if the new rectangle is too small to render
-
-		return [] # stop branch
+		return []
+		#return [pygame.Rect((left_bound, top_bound), (bottom_bound, right_bound))] # stop branch
 
 	width_addend = width_difference * random.uniform(lower_mult, upper_mult)
 	height_addend = height_difference * random.uniform(lower_mult, upper_mult)
@@ -49,10 +50,8 @@ def recursive_rect_list(
 	width_addend = int(width_addend)
 	height_addend = int(height_addend)
 
-	new_left_bound = left_bound + width_addend
-
 	current_rect_obj = pygame.Rect((left_bound, top_bound),
-		(left_bound + width_addend,top_bound + height_addend))
+		(left_bound + width_addend, top_bound + height_addend))
 
 	bottom_rects = recursive_rect_list(left_bound = left_bound, 
 		right_bound = right_bound - width_addend,
@@ -73,16 +72,16 @@ def recursive_rect_list(
 	return [current_rect_obj] + bottom_rects + right_rects + bottomright_rects
 
 def main():
-
-	screen.fill(WHITE)
 	rect_list = recursive_rect_list()
 
+	screen.fill(WHITE)
 	for rect in rect_list:
 		random_color = tuple(int(random.randint(0,255)) for _ in range(3))
 		
 		pygame.draw.rect(screen, random_color, rect)
 		pygame.display.update()
-	# screen.blit(screen, (0,0))
+		raw_input()
+		
 	
 	while True:
 
@@ -90,9 +89,5 @@ def main():
 			if event.type == pygame.QUIT:
 				sys.exit()
 
-		pygame.display.flip()
-
 if __name__ == '__main__':
 	main()
-
-
